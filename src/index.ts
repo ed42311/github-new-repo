@@ -14,13 +14,13 @@ app.get('/oauth/redirect', async (req: Request) => {
     const requestToken = req.query.code;
     const tokenResponse = await axios({
         method: 'post',
-        url: `https://github.com/login/oauth/access_token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${requestToken}&scopes=repo`,
+        url: `https://github.com/login/oauth/access_token?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&code=${requestToken}&scope=user%20public_repo%20repo`,
         headers: {
             accept: 'application/json',
         },
     });
     const accessToken = tokenResponse.data.access_token;
-    console.log(accessToken);
+    console.log(tokenResponse);
     const octokit = new Octokit({ auth: accessToken });
     const response = await octokit.request('POST /user/repos', {
         name: 'hello_world',
