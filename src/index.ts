@@ -1,7 +1,6 @@
-import express, { Request } from 'express';
+import express, { Request, Response } from 'express';
 import axios from 'axios';
 import { config } from 'dotenv';
-import { Octokit } from '@octokit/core';
 
 config();
 
@@ -10,7 +9,8 @@ const { CLIENT_ID, CLIENT_SECRET } = process.env;
 
 app.use(express.static(__dirname + '/public'));
 
-app.get('/oauth/redirect', async (req: Request) => {
+app.get('/oauth/redirect', async (req: Request, res: Response) => {
+    console.log('INFO :: REDIRECT ');
     const requestToken = req.query.code;
     const tokenResponse = await axios({
         method: 'post',
@@ -19,14 +19,10 @@ app.get('/oauth/redirect', async (req: Request) => {
             accept: 'application/json',
         },
     });
+    console.log(tokenResponse.data);
     const accessToken = tokenResponse.data.access_token;
     console.log(accessToken);
-    const octokit = new Octokit({ auth: accessToken });
-    const response = await octokit.request('POST /user/repos', {
-        name: 'hello_world',
-    });
-
-    console.log(response);
+    res.status(200).json({ success: true });
 });
 
 app.listen(8080);
@@ -34,6 +30,6 @@ app.listen(8080);
 // curl \
 //   -X POST \
 //   -H "Accept: " \
-//   -H "Authorization: token 78cbecbe71cc27d6abf607bddc13f17b13697719" \
+//   -H "Authorization: token b75f2ebb38107ce35e5311293ab3398c266cce36" \
 //   https://api.github.com/user/repos \
 //   -d '{"name":"name"}'
